@@ -1,9 +1,14 @@
 require('dotenv').config()
 const express = require('express');
+const cors = require("cors");
 const mongoose = require("mongoose")
+
 const app = express();
 
 app.use(cors())
+app.use(express.json())
+app.use(express.urlencoded({extended:true}))
+
 const port = process.env.PORT || process.env.STANDARD_PORT;
 
 const databaseConnection = process.env.MONGO_DB_CONNECTION_STRING;
