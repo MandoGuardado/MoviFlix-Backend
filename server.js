@@ -9,10 +9,10 @@ app.use(cors())
 app.use(express.json())
 app.use(express.urlencoded({extended:true}))
 
+
 const port = process.env.PORT || process.env.STANDARD_PORT;
 
-const databaseConnection = process.env.MONGO_DB_CONNECTION_STRING;
-mongoose.connect(databaseConnection)
+
 
 const userSchema = new mongoose.Schema({
     name: String,
@@ -84,7 +84,16 @@ app.delete('/testing_backend', (req, res) =>{
 
 })
 
+const options = {
+    useNewUrlParser:true,
+    useUnifiedTopology: true,
+
+}
 
 
+mongoose.connect(process.env.MONGO_DB_CONNECTION_STRING, options).then(() =>{
+    console.log("Database connection successfull");
+    app.listen(port, () => console.log(`Listening on port ${port}`));
 
-app.listen(port, () => console.log(`Listening on port ${port}`));
+})
+
