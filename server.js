@@ -3,7 +3,7 @@ const express = require('express');
 const cors = require("cors");
 const mongoose = require("mongoose")
 const User = require("./models/user")
-const { getUpComingMovies, getMovieDetails } = require("./services")
+const { getUpComingMovies, getMovieDetails, getTrending, getTrendingDetails } = require("./services")
 
 
 const app = express();
@@ -16,30 +16,42 @@ app.use(express.urlencoded({ extended: true }))
 const port = process.env.PORT || process.env.STANDARD_PORT;
 
 
-app.get('/upcoming-movies', async(req, res) => {
-    const promises= []
+app.get('/upcoming-movies', async (req, res) => {
+    const promises = []
     const baseUrl = "https://image.tmdb.org/t/p/";
     let json = await getUpComingMovies();
-   json.results.forEach(element => {
-    promises.push(getMovieDetails(element.id))
-  
+    json.results.forEach(element => {
+        promises.push(getMovieDetails(element.id))
+
     });
 
     Promise.all(promises).then(movieResult => {
-        movieResult.forEach( movie =>{
+        movieResult.forEach(movie => {
             movie.backdrop_path = baseUrl.concat("w780", movie.backdrop_path)
             movie.poster_path = baseUrl.concat("w500", movie.poster_path)
-            modifiedResult.push(movie)
         })
-       res.status(200).send(movieResult)
+        res.status(200).send(movieResult)
     })
 
 
 });
 
-app.get('/getImages' , async(req, res) =>{
-    let json = await getMovieDetails(482321);
-    res.status(200).send(json)
+app.get('/trending', async (req, res) => {
+    const promises = []
+    const baseUrl = "https://image.tmdb.org/t/p/";
+    let json = await getTrending();
+    json.results.forEach(element => {
+        promises.push(getTrendingDetails(element.id, element.media_type))
+
+    });
+
+    Promise.all(promises).then(trendingResult => {
+        trendingResult.forEach(item => {
+            item.backdrop_path = baseUrl.concat("w780", item.backdrop_path)
+            item.poster_path = baseUrl.concat("w500", item.poster_path)
+        })
+        res.status(200).send(trendingResult)
+    })
 
 })
 
