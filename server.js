@@ -3,7 +3,7 @@ const express = require('express');
 const cors = require("cors");
 const mongoose = require("mongoose")
 const User = require("./models/user")
-const { getUpComingMovies } = require("./services")
+const { getUpComingMovies, getMovieDetails } = require("./services")
 
 
 const app = express();
@@ -17,9 +17,20 @@ const port = process.env.PORT || process.env.STANDARD_PORT;
 
 
 app.get('/testing_backend', async(req, res) => {
+    const baseUrl = "https://image.tmdb.org/t/p/";
     let json = await getUpComingMovies();
-    res.status(200).send(json.results);
+   json.results.forEach(element => {
+       element.backdrop_path = baseUrl.concat("w780",element.backdrop_path)
+       element.poster_path = baseUrl.concat("w500",element.poster_path)
+    });
+    res.status(200).send(json);
 });
+
+app.get('/getImages' , async(req, res) =>{
+    let json = await getMovieDetails(482321);
+    res.status(200).send(json)
+
+})
 
 app.post('/testing_backend', (req, res) => {
     const user = new User({
