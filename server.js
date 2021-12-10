@@ -16,14 +16,25 @@ app.use(express.urlencoded({ extended: true }))
 const port = process.env.PORT || process.env.STANDARD_PORT;
 
 
-app.get('/testing_backend', async(req, res) => {
+app.get('/upcoming-movies', async(req, res) => {
+    const promises= []
     const baseUrl = "https://image.tmdb.org/t/p/";
     let json = await getUpComingMovies();
    json.results.forEach(element => {
-       element.backdrop_path = baseUrl.concat("w780",element.backdrop_path)
-       element.poster_path = baseUrl.concat("w500",element.poster_path)
+    promises.push(getMovieDetails(element.id))
+  
     });
-    res.status(200).send(json);
+
+    Promise.all(promises).then(movieResult => {
+        movieResult.forEach( movie =>{
+            movie.backdrop_path = baseUrl.concat("w780", movie.backdrop_path)
+            movie.poster_path = baseUrl.concat("w500", movie.poster_path)
+            modifiedResult.push(movie)
+        })
+       res.status(200).send(movieResult)
+    })
+
+
 });
 
 app.get('/getImages' , async(req, res) =>{
