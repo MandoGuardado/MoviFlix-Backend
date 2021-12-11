@@ -19,7 +19,7 @@ const imageBaseUrl = "https://image.tmdb.org/t/p/";
 
 //MOVIES
 //upcoming-movies path
-app.get('/upcoming-movies', async (req, res) => {
+app.get('/movies/upcoming', async (req, res) => {
     const promises = []
     let json = await makeFetchCall("upcoming-movies");
     json.results.forEach(element => {
@@ -39,7 +39,7 @@ app.get('/upcoming-movies', async (req, res) => {
 });
 
 //popular-movies path
-app.get('/popular-movies', async (req, res) =>{
+app.get('/movies/popular', async (req, res) =>{
     const promises =[];
     let json = await makeFetchCall("popular-movies");
     json.results.forEach(element =>{
@@ -76,7 +76,7 @@ app.get('/trending', async (req, res) => {
 
 
 //tv 
-app.get('/popular-tv', async (req, res) => {
+app.get('/tv/popular', async (req, res) => {
     const promises = []
     let json = await makeFetchCall("popular-tv");
     json.results.forEach(element => {
@@ -94,7 +94,7 @@ app.get('/popular-tv', async (req, res) => {
 
 })
 
-app.get('/top-rated-tv', async (req, res) => {
+app.get('/tv/top-rated', async (req, res) => {
     const promises = []
     let json = await makeFetchCall("top-rated-tv");
     json.results.forEach(element => {
