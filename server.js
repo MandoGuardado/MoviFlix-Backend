@@ -3,7 +3,8 @@ const express = require('express');
 const cors = require("cors");
 const mongoose = require("mongoose")
 const User = require("./models/user")
-const { getUpComingMovies, getMovieDetails, getTrending, getTrendingDetails } = require("./services")
+const { getUpComingMovies, getMovieDetails, getTrending, getTrendingDetails,getPopularMovies, getElementDetails, getPopularTv, getLatestTv, getNowPlayingTv} = require("./services");
+const { base } = require('./models/user');
 
 
 const app = express();
@@ -15,7 +16,8 @@ app.use(express.urlencoded({ extended: true }))
 
 const port = process.env.PORT || process.env.STANDARD_PORT;
 
-
+//MOVIES
+//upcoming-movies path
 app.get('/upcoming-movies', async (req, res) => {
     const promises = []
     const baseUrl = "https://image.tmdb.org/t/p/";
@@ -36,6 +38,25 @@ app.get('/upcoming-movies', async (req, res) => {
 
 });
 
+//popular-movies path
+app.get('/popular-movies', async (req, res) =>{
+    const promises =[];
+    const baseUrl = "https://image.tmdb.org/t/p/";
+    let json = await getPopularMovies();
+    json.results.forEach(element =>{
+        promises.push(getElementDetails(element.id, "movie"))
+    });
+    Promise.all(promises).then(results =>{
+        results.forEach(item => {
+            item.backdrop_path = baseUrl.concat("w780", item.backdrop_path);
+            item.poster_path = baseUrl.concat("w500", item.poster_path)
+        })
+        res.status(200).send(results)
+    })
+}) 
+
+
+//trending path
 app.get('/trending', async (req, res) => {
     const promises = []
     const baseUrl = "https://image.tmdb.org/t/p/";
@@ -55,46 +76,46 @@ app.get('/trending', async (req, res) => {
 
 })
 
-app.post('/testing_backend', (req, res) => {
-    const user = new User({
-        name: "Armando",
-        password: "testagain",
-    })
 
-    user.save().then((err) => {
-        if (err) {
-            console.log(err)
-        }
-        else {
-            console.log('Item was successfully inserted to db.')
-        }
+//tv 
+app.get('/popular-tv', async (req, res) => {
+    const promises = []
+    const baseUrl = "https://image.tmdb.org/t/p/";
+    let json = await getPopularTv();
+    json.results.forEach(element => {
+        promises.push(getElementDetails(element.id, "tv"))
+
     });
 
-})
-
-app.put('/testing_backend', (req, res) => {
-    User.updateOne({ _id: "61b270ed2aee31f8ac3ed419" }, { name: "Armando Guardado" }, (err) => {
-        if (err) {
-            console.log(err)
-        }
-        else {
-            console.log("Sucessfully updated the document")
-        }
+    Promise.all(promises).then(movieResult => {
+        movieResult.forEach(movie => {
+            movie.backdrop_path = baseUrl.concat("w780", movie.backdrop_path)
+            movie.poster_path = baseUrl.concat("w500", movie.poster_path)
+        })
+        res.status(200).send(movieResult)
     })
 
 })
 
-app.delete('/testing_backend', (req, res) => {
-    User.deleteOne({ _id: "61b270ed2aee31f8ac3ed419" }, (err) => {
-        if (err) {
-            console.log(err)
-        }
-        else {
-            console.log("You have deleted the following document with id: " + "61b270ed2aee31f8ac3ed419")
-        }
-    })
+app.get('/top-rated-tv', async (req, res) => {
+    const promises = []
+    const baseUrl = "https://image.tmdb.org/t/p/";
+    let json = await getLatestTv();
+    json.results.forEach(element => {
+        promises.push(getElementDetails(element.id, "tv"))
 
+    });
+
+    Promise.all(promises).then(movieResult => {
+        movieResult.forEach(movie => {
+            movie.backdrop_path = baseUrl.concat("w780", movie.backdrop_path)
+            movie.poster_path = baseUrl.concat("w500", movie.poster_path)
+        })
+        res.status(200).send(movieResult)
+    })
 })
+
+
 
 const options = {
     useNewUrlParser: true,

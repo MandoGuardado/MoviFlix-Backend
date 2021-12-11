@@ -31,9 +31,38 @@ async function getTrendingDetails(mediaId, mediaType) {
   return json;
 }
 
+async function getPopularMovies() {
+  const baseURL = `https://api.themoviedb.org/3/movie/popular?api_key=${process.env.THE_MOVIE_DB_KEY}&language=en-US&page=1`
+  let response = await fetch(baseURL);
+  let json = await response.json();
+  return json;
+}
+
+
+async function getElementDetails(mediaId, mediaType) {
+  const movieDetailsUrl = `https://api.themoviedb.org/3/${mediaType}/${mediaId}?api_key=${process.env.THE_MOVIE_DB_KEY}&language=en-US&append_to_response=videos,images`
+  let response = await fetch(movieDetailsUrl);
+  let json = await response.json();
+  return json;
+}
+
+
+async function getPopularTv() {
+  const baseURL = `https://api.themoviedb.org/3/tv/popular?api_key=${process.env.THE_MOVIE_DB_KEY}&language=en-US&page=1`
+  let response = await fetch(baseURL);
+  let json = await response.json();
+  return json;
+}
+
+async function getTopRatedTv() {
+  const baseURL = `https://api.themoviedb.org/3/tv/top_rated?api_key=${process.env.THE_MOVIE_DB_KEY}&language=en-US&page=1`
+  let response = await fetch(baseURL);
+  let json = await response.json();
+  return json;
+}
 
 
 
 module.exports = {
-  getUpComingMovies, getMovieDetails, getTrendingDetails, getTrending
+  getUpComingMovies, getMovieDetails, getTrendingDetails, getTrending, getPopularMovies, getElementDetails, getPopularTv, getLatestTv: getTopRatedTv 
 }
