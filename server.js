@@ -3,7 +3,7 @@ const express = require('express');
 const cors = require("cors");
 const mongoose = require("mongoose")
 const User = require("./models/user")
-const { getUpComingMovies, getMovieDetails, getTrending, getTrendingDetails } = require("./services")
+const { makeFetchCall, getElementDetails} = require("./services");
 
 
 const app = express();
@@ -15,20 +15,22 @@ app.use(express.urlencoded({ extended: true }))
 
 const port = process.env.PORT || process.env.STANDARD_PORT;
 
+const imageBaseUrl = "https://image.tmdb.org/t/p/";
 
-app.get('/upcoming-movies', async (req, res) => {
+//MOVIES
+//upcoming-movies path
+app.get('/movies/upcoming', async (req, res) => {
     const promises = []
-    const baseUrl = "https://image.tmdb.org/t/p/";
-    let json = await getUpComingMovies();
+    let json = await makeFetchCall("upcoming-movies");
     json.results.forEach(element => {
-        promises.push(getMovieDetails(element.id))
+        promises.push(getElementDetails(element.id, "movie"))
 
     });
 
     Promise.all(promises).then(movieResult => {
         movieResult.forEach(movie => {
-            movie.backdrop_path = baseUrl.concat("w780", movie.backdrop_path)
-            movie.poster_path = baseUrl.concat("w500", movie.poster_path)
+            movie.backdrop_path = imageBaseUrl.concat("w780", movie.backdrop_path)
+            movie.poster_path = imageBaseUrl.concat("w500", movie.poster_path)
         })
         res.status(200).send(movieResult)
     })
@@ -36,65 +38,80 @@ app.get('/upcoming-movies', async (req, res) => {
 
 });
 
+//popular-movies path
+app.get('/movies/popular', async (req, res) =>{
+    const promises =[];
+    let json = await makeFetchCall("popular-movies");
+    json.results.forEach(element =>{
+        promises.push(getElementDetails(element.id, "movie"))
+    });
+    Promise.all(promises).then(results =>{
+        results.forEach(item => {
+            item.backdrop_path = imageBaseUrl.concat("w780", item.backdrop_path);
+            item.poster_path = imageBaseUrl.concat("w500", item.poster_path)
+        })
+        res.status(200).send(results)
+    })
+}) 
+
+
+//trending path
 app.get('/trending', async (req, res) => {
     const promises = []
-    const baseUrl = "https://image.tmdb.org/t/p/";
-    let json = await getTrending();
+    let json = await makeFetchCall("trending");
     json.results.forEach(element => {
-        promises.push(getTrendingDetails(element.id, element.media_type))
+        promises.push(getElementDetails(element.id, element.media_type))
 
     });
 
     Promise.all(promises).then(trendingResult => {
         trendingResult.forEach(item => {
-            item.backdrop_path = baseUrl.concat("w780", item.backdrop_path)
-            item.poster_path = baseUrl.concat("w500", item.poster_path)
+            item.backdrop_path = imageBaseUrl.concat("w780", item.backdrop_path)
+            item.poster_path = imageBaseUrl.concat("w500", item.poster_path)
         })
         res.status(200).send(trendingResult)
     })
 
 })
 
-app.post('/testing_backend', (req, res) => {
-    const user = new User({
-        name: "Armando",
-        password: "testagain",
-    })
 
-    user.save().then((err) => {
-        if (err) {
-            console.log(err)
-        }
-        else {
-            console.log('Item was successfully inserted to db.')
-        }
+//tv 
+app.get('/tv/popular', async (req, res) => {
+    const promises = []
+    let json = await makeFetchCall("popular-tv");
+    json.results.forEach(element => {
+        promises.push(getElementDetails(element.id, "tv"))
+
     });
 
-})
-
-app.put('/testing_backend', (req, res) => {
-    User.updateOne({ _id: "61b270ed2aee31f8ac3ed419" }, { name: "Armando Guardado" }, (err) => {
-        if (err) {
-            console.log(err)
-        }
-        else {
-            console.log("Sucessfully updated the document")
-        }
+    Promise.all(promises).then(movieResult => {
+        movieResult.forEach(movie => {
+            movie.backdrop_path = imageBaseUrl.concat("w780", movie.backdrop_path)
+            movie.poster_path = imageBaseUrl.concat("w500", movie.poster_path)
+        })
+        res.status(200).send(movieResult)
     })
 
 })
 
-app.delete('/testing_backend', (req, res) => {
-    User.deleteOne({ _id: "61b270ed2aee31f8ac3ed419" }, (err) => {
-        if (err) {
-            console.log(err)
-        }
-        else {
-            console.log("You have deleted the following document with id: " + "61b270ed2aee31f8ac3ed419")
-        }
-    })
+app.get('/tv/top-rated', async (req, res) => {
+    const promises = []
+    let json = await makeFetchCall("top-rated-tv");
+    json.results.forEach(element => {
+        promises.push(getElementDetails(element.id, "tv"))
 
+    });
+
+    Promise.all(promises).then(movieResult => {
+        movieResult.forEach(movie => {
+            movie.backdrop_path = imageBaseUrl.concat("w780", movie.backdrop_path)
+            movie.poster_path = imageBaseUrl.concat("w500", movie.poster_path)
+        })
+        res.status(200).send(movieResult)
+    })
 })
+
+
 
 const options = {
     useNewUrlParser: true,
