@@ -3,7 +3,7 @@ const express = require('express');
 const cors = require("cors");
 const mongoose = require("mongoose")
 const User = require("./models/user")
-const { makeFetchCall, getElementDetails} = require("./services");
+const { makeFetchCall, getElementDetails } = require("./services");
 
 
 const app = express();
@@ -32,27 +32,33 @@ app.get('/movies/upcoming', async (req, res) => {
             movie.backdrop_path = imageBaseUrl.concat("w780", movie.backdrop_path)
             movie.poster_path = imageBaseUrl.concat("w500", movie.poster_path)
         })
-        res.status(200).send(movieResult)
+        res.status(200).send({
+            category: "Upcoming Movies",
+            results: movieResult
+        })
     })
 
 
 });
 
 //popular-movies path
-app.get('/movies/popular', async (req, res) =>{
-    const promises =[];
+app.get('/movies/popular', async (req, res) => {
+    const promises = [];
     let json = await makeFetchCall("popular-movies");
-    json.results.forEach(element =>{
+    json.results.forEach(element => {
         promises.push(getElementDetails(element.id, "movie"))
     });
-    Promise.all(promises).then(results =>{
+    Promise.all(promises).then(results => {
         results.forEach(item => {
             item.backdrop_path = imageBaseUrl.concat("w780", item.backdrop_path);
             item.poster_path = imageBaseUrl.concat("w500", item.poster_path)
         })
-        res.status(200).send(results)
+        res.status(200).send({
+            category: "Popular Movies",
+            results: results
+        })
     })
-}) 
+})
 
 
 //trending path
@@ -69,7 +75,10 @@ app.get('/trending', async (req, res) => {
             item.backdrop_path = imageBaseUrl.concat("w780", item.backdrop_path)
             item.poster_path = imageBaseUrl.concat("w500", item.poster_path)
         })
-        res.status(200).send(trendingResult)
+        res.status(200).send({
+            category: "Trending",
+            results: trendingResult
+        })
     })
 
 })
@@ -89,7 +98,10 @@ app.get('/tv/popular', async (req, res) => {
             movie.backdrop_path = imageBaseUrl.concat("w780", movie.backdrop_path)
             movie.poster_path = imageBaseUrl.concat("w500", movie.poster_path)
         })
-        res.status(200).send(movieResult)
+        res.status(200).send({
+            category: "Popular TV",
+            results: movieResult,
+        })
     })
 
 })
@@ -107,8 +119,15 @@ app.get('/tv/top-rated', async (req, res) => {
             movie.backdrop_path = imageBaseUrl.concat("w780", movie.backdrop_path)
             movie.poster_path = imageBaseUrl.concat("w500", movie.poster_path)
         })
-        res.status(200).send(movieResult)
+        res.status(200).send({
+            category: "Top Rated Tv",
+            results: movieResult
+        })
     })
+})
+
+app.get('/db/movies/upcoming', async (req, res) => {
+
 })
 
 
