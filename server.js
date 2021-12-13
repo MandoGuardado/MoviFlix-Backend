@@ -60,6 +60,27 @@ app.get('/movies/popular', async (req, res) => {
     })
 })
 
+app.get('/movies/now-playing', async (req, res) => {
+    const promises = [];
+    let json = await makeFetchCall("now-playing");
+    json.results.forEach(element => {
+        promises.push(getElementDetails(element.id, "movie"))
+    });
+    Promise.all(promises).then(results => {
+        results.forEach(item => {
+            item.backdrop_path = imageBaseUrl.concat("w780", item.backdrop_path);
+            item.poster_path = imageBaseUrl.concat("w500", item.poster_path)
+        })
+        res.status(200).send({
+            category: "Now Playing",
+            results: results
+        })
+    })
+})
+
+
+
+
 
 //trending path
 app.get('/trending', async (req, res) => {
@@ -125,6 +146,28 @@ app.get('/tv/top-rated', async (req, res) => {
         })
     })
 })
+
+app.get('/tv/on-the-air', async (req, res) => {
+    const promises = []
+    let json = await makeFetchCall("on-the-air");
+    json.results.forEach(element => {
+        promises.push(getElementDetails(element.id, "tv"))
+
+    });
+
+    Promise.all(promises).then(movieResult => {
+        movieResult.forEach(movie => {
+            movie.backdrop_path = imageBaseUrl.concat("w780", movie.backdrop_path)
+            movie.poster_path = imageBaseUrl.concat("w500", movie.poster_path)
+        })
+        res.status(200).send({
+            category: "On the Air",
+            results: movieResult
+        })
+    })
+})
+
+
 
 app.get('/db/movies/upcoming', async (req, res) => {
 

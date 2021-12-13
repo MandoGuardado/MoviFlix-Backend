@@ -20,6 +20,12 @@ async function makeFetchCall(fetchType){
     baseFetchUrl =`https://api.themoviedb.org/3/tv/top_rated?api_key=${process.env.THE_MOVIE_DB_KEY}&language=en-US&page=1`
 
   }
+  else if(fetchType === "now-playing") {
+    baseFetchUrl =`https://api.themoviedb.org/3/movie/now_playing?api_key=${process.env.THE_MOVIE_DB_KEY}&language=en-US&page=1&region=US`
+  }
+  else if(fetchType === 'on-the-air'){
+    baseFetchUrl =`https://api.themoviedb.org/3/tv/on_the_air?api_key=${process.env.THE_MOVIE_DB_KEY}&language=en-US&page=1`
+  }
 
   let response = await fetch(baseFetchUrl);
   let json = await response.json();
