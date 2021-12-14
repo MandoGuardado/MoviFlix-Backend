@@ -168,14 +168,43 @@ app.get('/tv/on-the-air', async (req, res) => {
 })
 
 
-
-app.post('/favorites', async (req, res) => {
-    const {user:name, favMovie} = req. body;
-    const user = new User({
-        name: name,
-        favorites: favMovie,
+app.post("/get-favorites", (req, res) => {
+    const {fbId} = req.body;
+    User.find({firebaseId:fbId}, function(err, users){
+        if (!err && users.length !== 0 ) {
+            res.send(users[0].favorites)  
+        }
+        else{
+            res.send([])
+        }
     })
-    user.save()
+})
+
+
+
+app.post('/favorites', (req, res) => {
+    const { user: name, fbId, favMovie } = req.body;
+    User.find({ firebaseId: fbId }, function (err, users) {
+        // console.log(users[0].favorites)
+        if (!err && users.length === 0) {
+            const user = new User({
+                name: name,
+                firebaseId: fbId,
+                favorites: favMovie,
+            })
+            user.save()
+
+        }
+        else{
+            User.updateOne({firebaseId:fbId}, {favorites:favMovie}, function(err){
+                if(!err){
+                    console.log("Successfully updated favorites!")
+                }else{
+                    console.log(err)
+                }
+            })
+        }
+    })
     res.send("Received post request")
 })
 
