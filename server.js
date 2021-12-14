@@ -169,8 +169,14 @@ app.get('/tv/on-the-air', async (req, res) => {
 
 
 
-app.get('/db/movies/upcoming', async (req, res) => {
-
+app.post('/favorites', async (req, res) => {
+    const {user:name, favMovie} = req. body;
+    const user = new User({
+        name: name,
+        favorites: favMovie,
+    })
+    user.save()
+    res.send("Received post request")
 })
 
 
